@@ -27,18 +27,17 @@ Please download the processed datasets and pretrained models from the anonymous 
 Download the datasets and pretrained models first. Please prepare the basic folder structure as follows.
 
 ```bash
-/parent_folder
+/DE-YOLO
+  /data     # config files for datasets
+  /models   # python files for DE-YOLO
+  /pretrained_models  # folder for pretrained models
   /datasets   # folder for datasets 
-    /RTTS
-    /ExDark
-    ...
-  /DE-YOLO
-    /data     # config files for datasets
-    /models   # python files for DE-YOLO
-    /pretrained_models  # folder for pretrained models
-    requirements.txt
-    README.md
-    ...
+      /RTTS
+      /ExDark
+      ...
+  requirements.txt
+  README.md
+  ...
 ```
 
 ## Quick Test
@@ -59,5 +58,3 @@ bash test_rtts_deyolo.sh
 ## Train
 
 The source code for training our DE-YOLO will be available after the publication of the paper.
-
-
