@@ -11,10 +11,10 @@ The codebase is structured as a pip-installable package (`denet`).
 ## Setup
 
 ```bash
-pip install -e .           # core deps only (torch, numpy, opencv) — for extending DENet in other projects
+pip install -e .           # core deps only (torch, opencv) — for extending DENet in other projects
                            # Python >= 3.9
-pip install -e ".[full]"   # all deps pinned for paper reproducibility
-                           # Python == 3.9
+pip install --extra-index-url https://download.pytorch.org/whl/cu117 -e ".[full]"
+                           # all deps pinned for paper reproducibility, Python == 3.9
 ```
 
 `datasets/` and `pretrained_models/` are symlinks to external data directories.
