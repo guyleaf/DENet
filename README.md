@@ -2,6 +2,9 @@
 
 PyTorch implementation of **DENet: Detection-driven Enhancement Network for Object Detection under Adverse Weather Conditions** (ACCV 2022).
 
+## Notice
+It is refactored version. So, the evaluation results may slightly differ from original paper. I only confirm the results by test scripts.
+
 ![DE-YOLO architecture](figs/DE-YOLO.jpg)
 
 ## Installation
@@ -11,7 +14,7 @@ PyTorch implementation of **DENet: Detection-driven Enhancement Network for Obje
 pip install -e .
 
 # Full deps — for reproducing paper results (requires Python == 3.9)
-pip install -e ".[full]"
+pip install --extra-index-url https://download.pytorch.org/whl/cu117 -e ".[full]"
 ```
 
 **Core dependencies:**
