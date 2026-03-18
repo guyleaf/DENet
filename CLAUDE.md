@@ -72,6 +72,11 @@ test.py → TestOptions.init() → init_model() → evaluate()
 - `utils/datasets.py` — `create_dataloader()`, dataset classes, caching
 - `utils/yolo_utils.py` — NMS, anchor utilities, coordinate transforms
 - `utils/metrics.py` — precision-recall, AP, COCO evaluation
+- `utils/general.py` — misc helpers (file I/O, logging, bbox utils)
+- `utils/torch_utils.py` — model introspection, device setup, parameter counts
+- `utils/plots.py` — visualization helpers (bounding box drawing, result images)
+- `utils/ssim.py` — SSIM loss used by the enhancement module
+- `utils/pycocotools/` — vendored pycocotools (coco.py, cocoeval.py, mask.py)
 - `data/*.yaml` — dataset configs (paths, class names)
 - `hyp/hyp.voc.scratch.yaml` — hyperparameters (loss weights, augmentation, optimizer)
 
@@ -80,3 +85,6 @@ test.py → TestOptions.init() → init_model() → evaluate()
 **Checkpoint loading** uses a tolerant `_load_state_dict_()` that skips mismatched shapes, allowing partial weight loading.
 
 **Output:** each run creates a timestamped directory under `runs/<project>/<name>/`; visualization images (`test_batch*.jpg`) are saved there during evaluation.
+
+## Additional Docs
+- Code Plans: @docs/plans
