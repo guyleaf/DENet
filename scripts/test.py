@@ -1,9 +1,17 @@
 import torch
 
-from common import evaluate, init_model
-from options.test_options import TestOptions
-from utils.datasets import create_dataloader
-from utils.yolo_utils import check_img_size
+from denet.engine.common import evaluate, init_model
+from denet.engine.options import TestOptions
+from denet.data.datasets import create_dataloader
+from denet.utils.yolo_utils import check_img_size
+
+
+def _torch_load(f, map_location=None):
+    """torch.load with weights_only=False for PyTorch >= 1.13, plain call for older."""
+    try:
+        return torch.load(f, map_location=map_location, weights_only=False)
+    except TypeError:
+        return torch.load(f, map_location=map_location)
 
 
 def test(opt, model, data_dict):
@@ -13,15 +21,11 @@ def test(opt, model, data_dict):
 
     # load state_dict
     if checkpoint.strip() != '':
-        ckpt = torch.load(checkpoint, map_location=device)  # load checkpoint
+        ckpt = _torch_load(checkpoint, map_location=device)  # load checkpoint
 
         # model state_dict
         model._load_state_dict_(ckpt['model'])
-        
-        # save_model = {"model": ckpt['model']}
-        # save_path = opt.run_dir + "/best.pt"
-        # torch.save(model, save_path)
-        
+
     img_size_test = check_img_size(img_size_test, s=model.Detect.stride.max())
 
     # test dataloader

@@ -8,10 +8,18 @@ import torch.optim as optim
 import yaml
 from tqdm import tqdm
 
-from utils.metrics import ap_per_class, coco_eval, get_batch_statistics
-from utils.plots import plot_images
-from utils.torch_utils import import_fun, is_parallel, time_synchronized
-from utils.yolo_utils import non_max_suppression, output_to_target
+from ..utils.metrics import ap_per_class, coco_eval, get_batch_statistics
+from ..utils.plots import plot_images
+from ..utils.torch_utils import import_fun, is_parallel, time_synchronized
+from ..utils.yolo_utils import non_max_suppression, output_to_target
+
+
+def _torch_load(f, map_location=None):
+    """torch.load with weights_only=False for PyTorch >= 1.13, plain call for older."""
+    try:
+        return torch.load(f, map_location=map_location, weights_only=False)
+    except TypeError:
+        return torch.load(f, map_location=map_location)
 
 
 def init_model(opt):
@@ -35,8 +43,8 @@ def init_model(opt):
         hyp = yaml.load(f, Loader=yaml.FullLoader)
 
     # load model
-    model = import_fun("models", opt.model.strip())(class_names, hyp,
-                                                    opt.verbose)
+    model = import_fun("denet.models", opt.model.strip())(class_names, hyp,
+                                                          opt.verbose)
     model = model.to(opt.device)
 
     return model, data_dict, hyp
@@ -115,10 +123,10 @@ def load_checkpoint(checkpoint, opt, model, optimizer, lr_scheduler,
         print(
             "--------------------------------------Resume--------------------------------------\n"
         )
-        ckpt = torch.load(checkpoint, map_location=device)  # load checkpoint
+        ckpt = _torch_load(checkpoint, map_location=device)  # load checkpoint
         # model state_dict
         model._load_state_dict_(ckpt['model'])
-        
+
         # if not resume training from checkpoint,
         # only load pretrained state_dict for finetune
         if opt.resume:

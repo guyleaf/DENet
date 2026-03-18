@@ -31,7 +31,7 @@ class BaseOptions():
             help='name of the experiment. used to makedir [run_dir]')
         parser.add_argument('--data',
                             type=str,
-                            default='./data/voc0712.yaml',
+                            default='./configs/voc0712.yaml',
                             help='data.yaml path')
         parser.add_argument('--data_mode',
                             type=str,
@@ -40,11 +40,11 @@ class BaseOptions():
                             help='dataset mode')
         parser.add_argument('--hyp',
                             type=str,
-                            default='./hyp/hyp.voc.scratch.yaml',
+                            default='./configs/hyp.voc.scratch.yaml',
                             help='hyperparameters path')
         parser.add_argument('--model',
                             type=str,
-                            default='yolov3.YOLOv3',
+                            default='deyolo.YOLOv3',
                             help='model')
         parser.add_argument('--batch_size',
                             '--bs',
@@ -234,3 +234,75 @@ class Logger(object):
     def flush(self):
         # sys.terminal.flush()
         pass
+
+
+class TestOptions(BaseOptions):
+    """This class includes test options.
+    It also includes shared options defined in BaseOptions.
+    """
+
+    def __init__(self, ):
+        super(TestOptions, self).__init__()
+        parser = self.parser
+        # testing parameters
+        parser.add_argument('--task',
+                            type=str,
+                            default='val',
+                            choices=['val', 'test'],
+                            help='kind of task')
+        parser.add_argument('--img_size_test',
+                            nargs='+',
+                            type=int,
+                            default=[544, 544],
+                            help='[w,h] image size')
+
+        # -----------init opt-----------#
+        self.opt = parser.parse_args()
+
+
+class TrainOptions(BaseOptions):
+    """ This class includes training options.
+        It also includes shared options defined in BaseOptions.
+    """
+    def __init__(self, ):
+        super(TrainOptions, self).__init__()
+        parser = self.parser
+        # training parameters
+        parser.add_argument('--img_size_train',
+                            nargs='+',
+                            type=int,
+                            default=[640, 352],
+                            help='[w,h] image size')
+        parser.add_argument('--img_size_test',
+                            nargs='+',
+                            type=int,
+                            default=[640, 352],
+                            help='[w,h] image size')
+        parser.add_argument('--epochs',
+                            type=int,
+                            default=300,
+                            help='number of epochs')
+        parser.add_argument('--freeze_layers',
+                            nargs='+',
+                            type=str,
+                            default=[],
+                            help='freeze_layers: backbone, neck, Detect')
+        parser.add_argument('--noamp',
+                            action='store_true',
+                            help='disable amp training')
+        parser.add_argument('--resume',
+                            action='store_true',
+                            help='resume training from checkpoint')
+        parser.add_argument('--multi_scale',
+                            action='store_true',
+                            help='multi_scale training')
+        parser.add_argument('--noautoanchor',
+                            action='store_true',
+                            help='disable autoanchor check')
+        parser.add_argument('--task',
+                            type=str,
+                            default='train',
+                            choices=['train'],
+                            help='kind of task')
+        # -----------init opt-----------#
+        self.opt = parser.parse_args()

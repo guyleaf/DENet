@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from utils.yolo_utils import xywh2xyxy
-# from utils.metrics import yolo_fitness
+from .yolo_utils import xywh2xyxy
+# from .metrics import yolo_fitness
 
 # Settings
 matplotlib.rc('font', **{'size': 11})
