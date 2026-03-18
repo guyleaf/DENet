@@ -1,60 +1,91 @@
 # DE-YOLO
-# PyTorch code for our ACCV2022 paper "DENet: Detection-driven Enhancement Network for Object Detection under Adverse Weather Conditions"
 
-![image](figs/DE-YOLO.jpg)
+PyTorch implementation of **DENet: Detection-driven Enhancement Network for Object Detection under Adverse Weather Conditions** (ACCV 2022).
 
-## Dependencies
-* python==3.7.5
-* torch==1.7.1
-* torchvision==0.8.2
-* tensorboard==2.5.0
-* numpy==1.19.5
-* opencv-python==4.2.0.34
-  
+![DE-YOLO architecture](figs/DE-YOLO.jpg)
+
+## Installation
+
 ```bash
-cd DE-YOLO 
-pip install -r ./requirements.txt
+# Core deps only (torch, numpy, opencv) — for extending DENet in other projects
+pip install -e .
+
+# Full deps — for reproducing paper results (requires Python == 3.9)
+pip install -e ".[full]"
 ```
+
+**Core dependencies:**
+- `torch>=1.13.1,<3`
+- `numpy>=1.24,<3`
+- `opencv-python>=4.2,<5`
+
+**Full dependencies** (pinned for paper reproducibility):
+- `torch==1.13.1`
+- `torchvision==0.14.1`
+- `numpy<2`
+- `tensorboard>=2.5,<3`
+- `PyYAML>=5.1,<6`
+- `scikit-learn>=0.21,<1`
+- `scipy>=1.5,<2`
+- `thop<1`
+- `tqdm<5`
+- `matplotlib>=3.1,<4`
+
+`datasets/` and `pretrained_models/` should be symlinks (or directories) pointing to the respective data.
 
 ## Datasets and Models
-Please download the processed datasets and pretrained models from the anonymous Github links below.
 
-[RTTS](https://github.com/NIvykk/research_demo/releases/download/V1.0/RTTS.zip) 
-[ExDark](https://github.com/NIvykk/research_demo/releases/download/V1.0/ExDark.zip)
-[Pretrained Models](https://github.com/NIvykk/research_demo/releases/download/V1.0/pretrained_models.zip)
+Download the processed datasets and pretrained models:
 
-## Folder structure
-Download the datasets and pretrained models first. Please prepare the basic folder structure as follows.
+- [ExDark](https://github.com/NIvykk/research_demo/releases/download/V1.0/ExDark.zip) — low-light, 10 classes
+- [RTTS](https://github.com/NIvykk/research_demo/releases/download/V1.0/RTTS.zip) — natural fog, 5 classes
+- [Pretrained Models](https://github.com/NIvykk/research_demo/releases/download/V1.0/pretrained_models.zip)
+
+Expected layout after extraction:
+
+```
+DENet/
+├── datasets/
+│   ├── ExDark/
+│   └── RTTS/
+└── pretrained_models/
+    ├── deyolo_lowlight/
+    │   └── best.pt
+    └── deyolo_foggy/
+        └── best.pt
+```
+
+## Evaluation
 
 ```bash
-/DE-YOLO
-  /data     # config files for datasets
-  /models   # python files for DE-YOLO
-  /pretrained_models  # folder for pretrained models
-  /datasets   # folder for datasets 
-      /RTTS
-      /ExDark
-      ...
-  requirements.txt
-  README.md
-  ...
+# ExDark (low-light, 10 classes)
+bash scripts/test_exdark_deyolo.sh
+
+# RTTS (foggy, 5 classes)
+bash scripts/test_rtts_deyolo.sh
 ```
 
-## Quick Test
-### Evaluation on real-world low-light images from ExDark 
-```bash  
-# put datasets and pretrained model in the corresponding directory 
-cd DE-YOLO 
-bash test_exdark_deyolo.sh
+Results and visualizations are saved under `runs/`. TensorBoard logs can be viewed with:
+
+```bash
+tensorboard --logdir ./runs
 ```
 
-### Evaluation on natural foggy images from RTTS
-```bash  
-# put datasets and pretrained model in the corresponding directory
-cd DE-YOLO 
-bash test_rtts_deyolo.sh
+## Training
+
+Training code is not released with this repository.
+
+## Package Structure
+
 ```
-
-## Train
-
-The source code for training our DE-YOLO will be available after the publication of the paper.
+denet/
+├── core/modules.py      # DENet enhancement module (Laplacian pyramid, Trans_low, Trans_high)
+├── models/deyolo.py     # Detector classes (YOLOv3, DEYOLO, Darknet53, Neck, Detect)
+├── engine/
+│   ├── common.py        # init_model(), evaluate(), get_optimizer(), load_checkpoint()
+│   └── options.py       # BaseOptions, TestOptions, TrainOptions
+├── data/
+│   ├── datasets.py      # create_dataloader(), yolo_dataset
+│   └── augmentations.py
+└── utils/               # NMS, metrics, plots, SSIM, LR scheduler, pycocotools
+```

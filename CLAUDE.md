@@ -11,9 +11,10 @@ The codebase is structured as a pip-installable package (`denet`).
 ## Setup
 
 ```bash
-pip install -e .           # core deps only (torch, numpy, opencv)
-pip install -e ".[full]"   # all deps including torchvision, tensorboard, etc.
-# Python >= 3.9
+pip install -e .           # core deps only (torch, numpy, opencv) — for extending DENet in other projects
+                           # Python >= 3.9
+pip install -e ".[full]"   # all deps pinned for paper reproducibility
+                           # Python == 3.9
 ```
 
 `datasets/` and `pretrained_models/` are symlinks to external data directories.
@@ -106,7 +107,7 @@ denet/
 - `denet/models/deyolo.py` — all detector classes
 - `denet/core/modules.py` — DENet enhancement classes
 - `denet/engine/options.py` — argument parsing (BaseOptions, TestOptions, TrainOptions)
-- `denet/data/datasets.py` — `create_dataloader()`, dataset classes, caching
+- `denet/data/datasets.py` — `create_dataloader()`, `yolo_dataset` (supports `"normal"` and `"train_paired"` modes for supervised enhancement training)
 - `denet/utils/yolo_utils.py` — NMS, anchor utilities, coordinate transforms
 - `denet/utils/metrics.py` — precision-recall, AP, COCO evaluation
 - `configs/*.yaml` — dataset configs and hyperparameters
@@ -116,7 +117,7 @@ denet/
 
 **Checkpoint loading** uses a tolerant `_load_state_dict_()` that skips mismatched shapes, allowing partial weight loading.
 
-**Output:** each run creates a timestamped directory under `runs/<project>/<name>/`; visualization images (`test_batch*.jpg`) are saved there during evaluation.
+**Output:** each run creates a timestamped directory under `runs/<task>/<project>/<timestamp>_<name>/`; visualization images (`test_batch*.jpg`) are saved there during evaluation.
 
 ## Key Imports
 
