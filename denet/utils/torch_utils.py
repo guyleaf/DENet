@@ -49,6 +49,7 @@ def initialize_weights(model):
 
 
 def profile(x, ops, n=100, device=None):
+    import thop
     # profile a pytorch module or list of modules. Example usage:
     #     x = torch.randn(16, 3, 640, 640)  # input
     #     m1 = lambda x: x * torch.sigmoid(x)
