@@ -280,6 +280,7 @@ class YOLO_BASE(nn.Module):
     def init_weight(self, ):
         initialize_weights(self)
 
+    @torch.no_grad()
     def _initialize_biases(self, cf=None):
         # initialize biases into Detect(), cf is class frequency
         # cf = torch.bincount(torch.tensor(np.concatenate(dataset.labels, 0)[:, 0]).long(), minlength=nc) + 1.
