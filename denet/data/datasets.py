@@ -9,9 +9,9 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
-from denet.data.augmentations import data_augments
-from denet.utils.general import get_hash
-from denet.utils.yolo_utils import xywhn2xyxy
+from .augmentations import data_augments
+from ..utils.general import get_hash
+from ..utils.yolo_utils import xywhn2xyxy
 
 img_formats = ['.bmp', '.jpg', '.jpeg', '.png', '.tif', '.tiff', '.dng']
 vid_formats = ['.mov', '.avi', '.mp4', '.mpg', '.mpeg', '.m4v', '.wmv', '.mkv']

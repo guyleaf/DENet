@@ -1,1 +1,1 @@
-from denet.models.deyolo import DEYOLO, YOLOv3
+from .deyolo import DEYOLO, YOLOv3

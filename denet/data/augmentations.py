@@ -4,7 +4,7 @@ import random
 import cv2
 import numpy as np
 
-from denet.utils.yolo_utils import xywhn2xyxy, xyxy2xywhn
+from ..utils.yolo_utils import xywhn2xyxy, xyxy2xywhn
 
 
 def data_augments(imgs, labels, hyp):

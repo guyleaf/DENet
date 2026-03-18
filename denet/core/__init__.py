@@ -1,1 +1,1 @@
-from denet.core.modules import DENet
+from .modules import DENet

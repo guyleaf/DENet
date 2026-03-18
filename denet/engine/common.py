@@ -8,10 +8,10 @@ import torch.optim as optim
 import yaml
 from tqdm import tqdm
 
-from denet.utils.metrics import ap_per_class, coco_eval, get_batch_statistics
-from denet.utils.plots import plot_images
-from denet.utils.torch_utils import import_fun, is_parallel, time_synchronized
-from denet.utils.yolo_utils import non_max_suppression, output_to_target
+from ..utils.metrics import ap_per_class, coco_eval, get_batch_statistics
+from ..utils.plots import plot_images
+from ..utils.torch_utils import import_fun, is_parallel, time_synchronized
+from ..utils.yolo_utils import non_max_suppression, output_to_target
 
 
 def _torch_load(f, map_location=None):

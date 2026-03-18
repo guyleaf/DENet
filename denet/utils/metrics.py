@@ -3,8 +3,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from denet.utils.plots import plot_mc_curve, plot_pr_curve
-from denet.utils.yolo_utils import (box_iou, scale_coords, xywh2xyxy, xyxy2xywh)
+from .plots import plot_mc_curve, plot_pr_curve
+from .yolo_utils import (box_iou, scale_coords, xywh2xyxy, xyxy2xywh)
 
 
 def yolo_fitness(x, is_coco):
@@ -255,8 +255,8 @@ def process_batch(detections, labels, iouv):
 
 def coco_eval(gt_json_file, pred_json_file, imgIds):
     # https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocoEvalDemo.ipynb
-    from denet.utils.pycocotools.coco import COCO
-    from denet.utils.pycocotools.cocoeval import COCOeval
+    from .pycocotools.coco import COCO
+    from .pycocotools.cocoeval import COCOeval
     # init gt
     cocoGt = COCO(gt_json_file)
     # initialize COCO pred api

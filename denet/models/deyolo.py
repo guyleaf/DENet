@@ -3,9 +3,9 @@ import math
 import torch
 import torch.nn as nn
 
-from denet.core.modules import DENet
-from denet.utils.torch_utils import initialize_weights, is_parallel, model_info
-from denet.utils.yolo_utils import check_anchor_order
+from ..core.modules import DENet
+from ..utils.torch_utils import initialize_weights, is_parallel, model_info
+from ..utils.yolo_utils import check_anchor_order
 
 
 # CBL = Conv2d + BatchNormalization + LeakyReLU
