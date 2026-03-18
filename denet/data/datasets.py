@@ -9,12 +9,20 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
-from utils.augmentations import data_augments
-from utils.general import get_hash
-from utils.yolo_utils import xywhn2xyxy
+from denet.data.augmentations import data_augments
+from denet.utils.general import get_hash
+from denet.utils.yolo_utils import xywhn2xyxy
 
 img_formats = ['.bmp', '.jpg', '.jpeg', '.png', '.tif', '.tiff', '.dng']
 vid_formats = ['.mov', '.avi', '.mp4', '.mpg', '.mpeg', '.m4v', '.wmv', '.mkv']
+
+
+def _torch_load(f, map_location=None):
+    """torch.load with weights_only=False for PyTorch >= 1.13, plain call for older."""
+    try:
+        return torch.load(f, map_location=map_location, weights_only=False)
+    except TypeError:
+        return torch.load(f, map_location=map_location)
 
 
 def create_dataloader(data_dict,
@@ -223,7 +231,7 @@ class yolo_dataset(Dataset):  # for training/testing
                          ) + '/' + self.name + '.%s.cache' % self.task
 
         try:
-            cache = torch.load(cache_path)
+            cache = _torch_load(cache_path)
             assert cache['hash'] == get_hash(self.label_files +
                                              self.img_files)  # dataset changed
         except Exception:
@@ -362,5 +370,3 @@ def load_image(path, resize_wh=None):
         img = cv2.resize(img, (resize_wh[0], resize_wh[1]),
                          interpolation=cv2.INTER_LINEAR)
     return img, (h0, w0)  # im, hw_original
-
-

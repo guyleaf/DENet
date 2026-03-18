@@ -3,8 +3,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from utils.plots import plot_mc_curve, plot_pr_curve
-from utils.yolo_utils import (box_iou, scale_coords, xywh2xyxy, xyxy2xywh)
+from denet.utils.plots import plot_mc_curve, plot_pr_curve
+from denet.utils.yolo_utils import (box_iou, scale_coords, xywh2xyxy, xyxy2xywh)
 
 
 def yolo_fitness(x, is_coco):
@@ -148,7 +148,7 @@ def get_batch_statistics(imgs, targets, paths, shapes0, output, seen, stats,
                          save_json, json_dict, is_coco):
     """ Compute true positives, predicted scores and predicted labels per sample """
     device = targets.device
-    
+
     _, _, height, width = imgs.shape  # batch size, channels, height, width
     targets[:, 2:] *= torch.Tensor([width, height, width,
                                     height]).to(device)  # to pixels
@@ -255,8 +255,8 @@ def process_batch(detections, labels, iouv):
 
 def coco_eval(gt_json_file, pred_json_file, imgIds):
     # https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocoEvalDemo.ipynb
-    from utils.pycocotools.coco import COCO
-    from utils.pycocotools.cocoeval import COCOeval
+    from denet.utils.pycocotools.coco import COCO
+    from denet.utils.pycocotools.cocoeval import COCOeval
     # init gt
     cocoGt = COCO(gt_json_file)
     # initialize COCO pred api

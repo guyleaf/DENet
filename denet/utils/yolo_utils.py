@@ -10,7 +10,7 @@ import torchvision
 import yaml
 from scipy.cluster.vq import kmeans
 from tqdm import tqdm
-from utils.torch_utils import is_parallel
+from denet.utils.torch_utils import is_parallel
 
 
 @contextmanager
@@ -471,7 +471,7 @@ def kmean_anchors(path='./data/coco128.yaml',
     if isinstance(path, str):  # *.yaml file
         with open(path) as f:
             data_dict = yaml.load(f, Loader=yaml.FullLoader)  # model dict
-        from utils.datasets import LoadImagesAndLabels
+        from denet.data.datasets import LoadImagesAndLabels
         dataset = LoadImagesAndLabels(data_dict['train'],
                                       augment=True,
                                       rect=True)

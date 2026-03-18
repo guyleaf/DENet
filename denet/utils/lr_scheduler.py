@@ -17,8 +17,8 @@ class WarmupCosineLR(_LRScheduler):
         last_epoch: int = -1,
     ):
         """
-        last_epoch : The index of the last batch.This parameter is used when resuming a training job. 
-        this number represents the total number of batches computed, not the total number of epochs computed. 
+        last_epoch : The index of the last batch.This parameter is used when resuming a training job.
+        this number represents the total number of batches computed, not the total number of epochs computed.
         >>> data_loader = torch.utils.data.DataLoader(...)
         >>> optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
         >>> scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, steps_per_epoch=len(data_loader), epochs=10)
