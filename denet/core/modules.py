@@ -127,22 +127,28 @@ class Trans_low(nn.Module):
                                      nn.Conv2d(16, ch_blocks, 3, padding=1),
                                      nn.LeakyReLU(True))
 
-        self.mm1 = nn.Conv2d(ch_blocks,
-                             ch_blocks // 4,
-                             kernel_size=1,
-                             padding=0)
-        self.mm2 = nn.Conv2d(ch_blocks,
-                             ch_blocks // 4,
-                             kernel_size=3,
-                             padding=3 // 2)
-        self.mm3 = nn.Conv2d(ch_blocks,
-                             ch_blocks // 4,
-                             kernel_size=5,
-                             padding=5 // 2)
-        self.mm4 = nn.Conv2d(ch_blocks,
-                             ch_blocks // 4,
-                             kernel_size=7,
-                             padding=7 // 2)
+        if self.compat_mode:
+            self.mm1 = nn.Conv2d(ch_blocks,
+                                ch_blocks // 4,
+                                kernel_size=1,
+                                padding=0)
+        else:
+            self.mm1 = nn.Conv2d(ch_blocks,
+                                ch_blocks // 4,
+                                kernel_size=1,
+                                padding=0)
+            self.mm2 = nn.Conv2d(ch_blocks,
+                                ch_blocks // 4,
+                                kernel_size=3,
+                                padding=3 // 2)
+            self.mm3 = nn.Conv2d(ch_blocks,
+                                ch_blocks // 4,
+                                kernel_size=5,
+                                padding=5 // 2)
+            self.mm4 = nn.Conv2d(ch_blocks,
+                                ch_blocks // 4,
+                                kernel_size=7,
+                                padding=7 // 2)
 
         self.decoder = nn.Sequential(nn.Conv2d(ch_blocks, 16, 3, padding=1),
                                      nn.LeakyReLU(True),
