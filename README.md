@@ -10,7 +10,7 @@ It is refactored version. So, the evaluation results may slightly differ from or
 ## Installation
 
 ```bash
-# Core deps only (torch, numpy, opencv) — for extending DENet in other projects
+# Core deps only (torch, opencv) — for extending DENet in other projects
 pip install -e .
 
 # Full deps — for reproducing paper results (requires Python == 3.9)
@@ -19,7 +19,6 @@ pip install --extra-index-url https://download.pytorch.org/whl/cu117 -e ".[full]
 
 **Core dependencies:**
 - `torch>=1.13.1,<3`
-- `numpy>=1.24,<3`
 - `opencv-python>=4.2,<5`
 
 **Full dependencies** (pinned for paper reproducibility):
