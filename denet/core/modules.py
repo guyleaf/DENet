@@ -197,7 +197,7 @@ class SFT_layer(nn.Module):
         x = self.encoder(x)
         scale = self.scale_conv(guide)
         shift = self.shift_conv(guide)
-        x += x * scale + shift
+        x = x * (scale + 1) + shift
         x = self.decoder(x)
         return x
 
