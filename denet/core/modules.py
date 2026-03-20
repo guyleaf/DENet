@@ -1,6 +1,8 @@
+
 import cv2
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class Lap_Pyramid_Conv(nn.Module):
@@ -20,9 +22,9 @@ class Lap_Pyramid_Conv(nn.Module):
 
     def conv_gauss(self, x, kernel):
         n_channels, _, kw, kh = kernel.shape
-        x = torch.nn.functional.pad(x, (kw // 2, kh // 2, kw // 2, kh // 2),
+        x = F.pad(x, (kw // 2, kh // 2, kw // 2, kh // 2),
                                     mode='reflect')  # replicate    # reflect
-        x = torch.nn.functional.conv2d(x, kernel, groups=n_channels)
+        x = F.conv2d(x, kernel, groups=n_channels)
         return x
 
     def downsample(self, x):
@@ -45,6 +47,11 @@ class Lap_Pyramid_Conv(nn.Module):
         for _ in range(self.num_high):
             down = self.pyramid_down(current)
             up = self.upsample(down)
+            # crop to match original size for odd H/W dimensions.
+            # this is the standard Laplacian pyramid practice — equivalent to
+            # OpenCV's pyrUp(src, dstsize=original_size).
+            # ref: https://docs.opencv.org/4.x/d4/d1f/tutorial_pyramids.html
+            up = up[:, :, :current.size(2), :current.size(3)]
             diff = current - up
             pyr.append(diff)
             current = down
@@ -55,6 +62,11 @@ class Lap_Pyramid_Conv(nn.Module):
         image = pyr[0]
         for level in pyr[1:]:
             up = self.upsample(image)
+            # crop to match original size for odd H/W dimensions.
+            # this is the standard Laplacian pyramid practice — equivalent to
+            # OpenCV's pyrUp(src, dstsize=original_size).
+            # ref: https://docs.opencv.org/4.x/d4/d1f/tutorial_pyramids.html
+            up = up[:, :, :level.size(2), :level.size(3)]
             image = up + level
         return image
 
@@ -215,17 +227,28 @@ class Trans_high(nn.Module):
 class Up_guide(nn.Module):
     def __init__(self, kernel_size=1, ch=3):
         super().__init__()
-        self.up = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True),
-            nn.Conv2d(ch,
-                      ch,
-                      kernel_size,
-                      stride=1,
-                      padding=kernel_size // 2,
-                      bias=False))
+        # backward compatibility with old checkpoint
+        self.up = nn.ModuleList(
+            [
+                nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True),
+                nn.Conv2d(ch,
+                        ch,
+                        kernel_size,
+                        stride=1,
+                        padding=kernel_size // 2,
+                        bias=False)
+            ])
 
-    def forward(self, x):
-        x = self.up(x)
+    def forward(self, x, target_size=None):
+        up, conv = self.up
+        x = up(x)
+        if target_size is not None:
+            # crop guide to match pyramid level size (odd H/W handling)
+            # standard practice in encoder-decoder architectures (e.g., U-Net 
+            # uses F.pad with negative values to crop after upsampling).
+            # ref: https://github.com/milesial/Pytorch-UNet/blob/master/unet/unet_parts.py#L6
+            x = x[:, :, :target_size[0], :target_size[1]]
+        x = conv(x)
         return x
 
 
@@ -259,7 +282,8 @@ class DENet(nn.Module):
 
         commom_guide = []
         for i in range(self.num_high):
-            guide = self.__getattr__('up_guide_layer_{}'.format(i))(guide)
+            guide = self.__getattr__('up_guide_layer_{}'.format(i))(
+                guide, target_size=pyrs[-2 - i].shape[2:])
             commom_guide.append(guide)
 
         for i in range(self.num_high):
