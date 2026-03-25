@@ -10,14 +10,13 @@ class Lap_Pyramid_Conv(nn.Module):
         super().__init__()
 
         self.num_high = num_high
-        self.kernel = self.gauss_kernel(kernel_size, channels)
+        self.register_buffer("kernel", self.gauss_kernel(kernel_size, channels))
 
     def gauss_kernel(self, kernel_size, channels):
         kernel = cv2.getGaussianKernel(kernel_size, 0).dot(
-            cv2.getGaussianKernel(kernel_size, 0).T)
-        kernel = torch.FloatTensor(kernel).unsqueeze(0).repeat(
-            channels, 1, 1, 1)
-        kernel = torch.nn.Parameter(data=kernel, requires_grad=False)
+            cv2.getGaussianKernel(kernel_size, 0).T
+        )
+        kernel = torch.FloatTensor(kernel).unsqueeze(0).expand(channels, -1, -1, -1)
         return kernel
 
     def conv_gauss(self, x, kernel):
