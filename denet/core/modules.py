@@ -40,7 +40,6 @@ class Lap_Pyramid_Conv(nn.Module):
         return self.conv_gauss(up, self.kernel)
 
     def pyramid_decom(self, img):
-        self.kernel = self.kernel.to(img.device)
         current = img
         pyr = []
         for _ in range(self.num_high):
