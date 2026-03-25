@@ -254,14 +254,14 @@ class Up_guide(nn.Module):
 
 class DENet(nn.Module):
     def __init__(self,
+                 compat_mode=True,
                  num_high=3,
                  ch_blocks=32,
                  up_ksize=1,
                  high_ch=32,
                  high_ksize=3,
                  ch_mask=32,
-                 gauss_kernel=5,
-                 compat_mode=True):
+                 gauss_kernel=5):
         super().__init__()
         self.num_high = num_high
         self.lap_pyramid = Lap_Pyramid_Conv(num_high, gauss_kernel)
