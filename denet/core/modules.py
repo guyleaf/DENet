@@ -108,12 +108,12 @@ class SpatialAttention(nn.Module):
 
 
 class Trans_guide(nn.Module):
-    def __init__(self, ch=16):
+    def __init__(self, ch=16, compat_mode=True):
         super().__init__()
 
         self.layer = nn.Sequential(
             nn.Conv2d(6, ch, 3, padding=1),
-            nn.LeakyReLU(True),
+            nn.LeakyReLU(True) if compat_mode else nn.LeakyReLU(inplace=True),
             SpatialAttention(3),
             nn.Conv2d(ch, 3, 3, padding=1),
         )
@@ -133,17 +133,23 @@ class Trans_low(nn.Module):
 
         self.compat_mode = compat_mode
 
-        self.encoder = nn.Sequential(nn.Conv2d(3, 16, 3, padding=1),
+        if self.compat_mode:
+            self.encoder = nn.Sequential(nn.Conv2d(3, 16, 3, padding=1),
                                      nn.LeakyReLU(True),
                                      nn.Conv2d(16, ch_blocks, 3, padding=1),
                                      nn.LeakyReLU(True))
-
-        if self.compat_mode:
             self.mm1 = nn.Conv2d(ch_blocks,
                                 ch_blocks // 4,
                                 kernel_size=1,
                                 padding=0)
+            self.decoder = nn.Sequential(nn.Conv2d(ch_blocks, 16, 3, padding=1),
+                                        nn.LeakyReLU(True),
+                                        nn.Conv2d(16, 3, 3, padding=1))
         else:
+            self.encoder = nn.Sequential(nn.Conv2d(3, 16, 3, padding=1),
+                                     nn.LeakyReLU(inplace=True),
+                                     nn.Conv2d(16, ch_blocks, 3, padding=1),
+                                     nn.LeakyReLU(inplace=True))
             self.mm1 = nn.Conv2d(ch_blocks,
                                 ch_blocks // 4,
                                 kernel_size=1,
@@ -160,12 +166,11 @@ class Trans_low(nn.Module):
                                 ch_blocks // 4,
                                 kernel_size=7,
                                 padding=7 // 2)
+            self.decoder = nn.Sequential(nn.Conv2d(ch_blocks, 16, 3, padding=1),
+                                        nn.LeakyReLU(inplace=True),
+                                        nn.Conv2d(16, 3, 3, padding=1))
 
-        self.decoder = nn.Sequential(nn.Conv2d(ch_blocks, 16, 3, padding=1),
-                                     nn.LeakyReLU(True),
-                                     nn.Conv2d(16, 3, 3, padding=1))
-
-        self.trans_guide = Trans_guide(ch_mask)
+        self.trans_guide = Trans_guide(ch_mask, compat_mode=compat_mode)
 
     def forward(self, x):
         x1 = self.encoder(x)
@@ -191,11 +196,11 @@ class Trans_low(nn.Module):
 
 
 class SFT_layer(nn.Module):
-    def __init__(self, in_ch=3, inter_ch=32, out_ch=3, kernel_size=3):
+    def __init__(self, in_ch=3, inter_ch=32, out_ch=3, kernel_size=3, compat_mode=True):
         super().__init__()
         self.encoder = nn.Sequential(
             nn.Conv2d(in_ch, inter_ch, kernel_size, padding=kernel_size // 2),
-            nn.LeakyReLU(True),
+            nn.LeakyReLU(True) if compat_mode else nn.LeakyReLU(inplace=True),
         )
         self.decoder = nn.Sequential(
             nn.Conv2d(inter_ch, out_ch, kernel_size, padding=kernel_size // 2))
@@ -214,10 +219,10 @@ class SFT_layer(nn.Module):
 
 
 class Trans_high(nn.Module):
-    def __init__(self, in_ch=3, inter_ch=32, out_ch=3, kernel_size=3):
+    def __init__(self, in_ch=3, inter_ch=32, out_ch=3, kernel_size=3, compat_mode=True):
         super().__init__()
 
-        self.sft = SFT_layer(in_ch, inter_ch, out_ch, kernel_size)
+        self.sft = SFT_layer(in_ch, inter_ch, out_ch, kernel_size, compat_mode=compat_mode)
 
     def forward(self, x, guide):
         return x + self.sft(x, guide)
@@ -270,7 +275,7 @@ class DENet(nn.Module):
             self.__setattr__('up_guide_layer_{}'.format(i),
                              Up_guide(up_ksize, ch=3))
             self.__setattr__('trans_high_layer_{}'.format(i),
-                             Trans_high(3, high_ch, 3, high_ksize))
+                             Trans_high(3, high_ch, 3, high_ksize, compat_mode=compat_mode))
 
     def forward(self, x):
         pyrs = self.lap_pyramid.pyramid_decom(img=x)
